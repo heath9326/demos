@@ -2,6 +2,8 @@ from django.urls import path
 
 from api.views import api_index, get_all_todos, HomePageView, add_todo, complete_todo, delete_completed
 
+app_name = 'todos'
+
 urlpatterns = [
     path('', api_index, name='api_index'),
     path('todos/', get_all_todos, name='get_all_todos'),

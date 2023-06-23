@@ -44,6 +44,7 @@ def delete_completed(request):
     ToDo.objects.filter(completed=True).delete()
     return redirect("homepage")
 
+
 def api_index(request):
     return HttpResponse('api index')
 
