@@ -1,0 +1,33 @@
+version: '3.0'
+services:
+#  backend:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    restart: on-failure
+#    ports:
+#      - 8000:8000
+#    depends_on:
+#      - db
+    #Maybe it needs volumes section:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123!
+      POSTGRES_DB: db
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - djangonetwork
+    ports:
+      - 5433:5432
+
+
+volumes:
+  db-volume: 
+
+networks:
+  djangonetwork:
+    driver: bridge
