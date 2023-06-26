@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 # Import app specific elements
 from api.models import ToDo
 from api.forms import CreateToDo
+from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -14,7 +15,13 @@ class HomePageView(generic.TemplateView):
     add_form = CreateToDo
     def get(self, request):
         if request.method == "GET":
-            todos = ToDo.objects.all().order_by("id").values()
+            #First get which user is logger in:
+            user = request.user
+            #Import all todos of the user
+            #todos = user.todos.all().order_by("id").values()
+            #User.contact_set.all()
+            #selects todos where user is user
+            todos = ToDo.objects.all().filter(user=user).order_by("id").values()
             args = {"todos": todos, "add_todo": self.add_form}
             return render(request, self.template_name, args)
 

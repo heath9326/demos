@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
 from datetime import datetime
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -11,6 +12,7 @@ class ToDo(models.Model):
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     objects = models.Manager()
 
