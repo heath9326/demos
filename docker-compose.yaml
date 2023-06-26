@@ -1,15 +1,20 @@
-version: '3.0'
+version: '3.6'
 services:
-#  backend:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    restart: on-failure
-#    ports:
-#      - 8000:8000
-#    depends_on:
-#      - db
-    #Maybe it needs volumes section:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8000"
+    depends_on:
+      - db
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    #networks:
+    #  - djangonetwork
+    volumes:
+      - ./project01:/app
   db:
     image: postgres:13
     environment:
@@ -19,8 +24,8 @@ services:
     volumes:
       - db-volume:/var/lib/postgresql/data
     restart: always
-    networks:
-      - djangonetwork
+    #networks:
+    #  - djangonetwork
     ports:
       - 5433:5432
 
@@ -28,6 +33,6 @@ services:
 volumes:
   db-volume: 
 
-networks:
-  djangonetwork:
-    driver: bridge
+#networks:
+#  djangonetwork:
+#    driver: bridge
