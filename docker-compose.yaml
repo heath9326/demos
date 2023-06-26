@@ -9,10 +9,6 @@ services:
       - "8080:8000"
     depends_on:
       - db
-    extra_hosts:
-    - "host.docker.internal:host-gateway"
-    #networks:
-    #  - djangonetwork
     volumes:
       - ./project01:/app
   db:
@@ -24,8 +20,6 @@ services:
     volumes:
       - db-volume:/var/lib/postgresql/data
     restart: always
-    #networks:
-    #  - djangonetwork
     ports:
       - 5433:5432
 
