@@ -3,21 +3,14 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-#from django.http import HttpResponseRedirect
-#from django.urls import reverse
-
-from django.contrib.auth.decorators import login_required
 
 from .forms import CreateUserForm
+
+
 # Create your views here.
-
-@login_required(login_url='login_page')
-def accounts_index(request):
-    return render(request, 'index.html')
-
 def register_page(request):
     if request.user.is_authenticated:
-        return redirect('accounts_index')
+        return redirect('todos:homepage')
     else:
         form = CreateUserForm()
         if request.method == "POST":
@@ -33,7 +26,7 @@ def register_page(request):
 
 def login_page(request):
     if request.user.is_authenticated:
-        return redirect('accounts_index')
+        return redirect('todos:homepage')
     else:
         if request.method == "POST":
             username = request.POST.get('username')
@@ -42,7 +35,7 @@ def login_page(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('accounts_index')
+                return redirect('todos:homepage')
                 # Redirecting to a different app does not work
                 #return HttpResponseRedirect('todos: homepage')
             else:

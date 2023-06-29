@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from api.models import ToDo
 from api.forms import CreateToDo
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -25,19 +26,23 @@ class HomePageView(generic.TemplateView):
             args = {"todos": todos, "add_todo": self.add_form}
             return render(request, self.template_name, args)
 
+
 # Form action views that redirect to home
+@login_required(login_url='login_page')
 @require_POST
 def add_todo(request):
     # Initialize the form:
     form = CreateToDo(request.POST)
 
     if form.is_valid():
+        user = request.user
         # Create the instance of the class:
-        new_todo = ToDo(body=request.POST["body"])
+        new_todo = ToDo(body=request.POST["body"], user=user)
         new_todo.save()
-        return redirect("homepage")
+        return redirect("todos:homepage")
 
 
+@login_required(login_url='login_page')
 def complete_todo(request, todo_id):
     # Get object id on click:
     thing = ToDo.objects.get(pk=todo_id)
@@ -45,11 +50,14 @@ def complete_todo(request, todo_id):
     thing.completed = True
     # Save
     thing.save()
-    return redirect("homepage")
+    return redirect("todos:homepage")
 
+
+@login_required(login_url='login_page')
 def delete_completed(request):
-    ToDo.objects.filter(completed=True).delete()
-    return redirect("homepage")
+    user = request.user
+    ToDo.objects.filter(completed=True, user=user).delete()
+    return redirect("todos:homepage")
 
 
 def api_index(request):
