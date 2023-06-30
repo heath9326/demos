@@ -3,11 +3,18 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.views.decorators.http import require_POST
 
+#For DRF
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import permissions
+
 # Import app specific elements
 from api.models import ToDo
 from api.forms import CreateToDo
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from api.serializers import ToDoSerializer
 
 
 # Create your views here.
@@ -18,9 +25,6 @@ class HomePageView(generic.TemplateView):
         if request.method == "GET":
             #First get which user is logger in:
             user = request.user
-            #Import all todos of the user
-            #todos = user.todos.all().order_by("id").values()
-            #User.contact_set.all()
             #selects todos where user is user
             todos = ToDo.objects.all().filter(user=user).order_by("id").values()
             args = {"todos": todos, "add_todo": self.add_form}
@@ -58,6 +62,16 @@ def delete_completed(request):
     user = request.user
     ToDo.objects.filter(completed=True, user=user).delete()
     return redirect("todos:homepage")
+
+class GetToDoView(APIView):
+    def get(self, request):
+        user = request.user
+        #Get the contance of ToDos tables:
+        queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
+        # Serializing extracted information
+        serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
+        # Give serialized data to the view
+        return Response(serilizer_for_queryset.data)
 
 
 def api_index(request):
