@@ -1,10 +1,12 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views import generic
+from rest_framework import generics as drf_generics
 from django.views.decorators.http import require_POST
 
 #For DRF
 from rest_framework.response import Response
+# class GetToDoView(APIView):
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
@@ -63,15 +65,21 @@ def delete_completed(request):
     ToDo.objects.filter(completed=True, user=user).delete()
     return redirect("todos:homepage")
 
-class GetToDoView(APIView):
-    def get(self, request):
-        user = request.user
-        #Get the contance of ToDos tables:
-        queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
-        # Serializing extracted information
-        serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
-        # Give serialized data to the view
-        return Response(serilizer_for_queryset.data)
+
+
+class GetToDoView(drf_generics.ListCreateAPIView):
+    serializer_class = ToDoSerializer
+    queryset = ToDo.objects.all()
+
+# class GetToDoView(APIView):
+#     def get(self, request):
+#         user = request.user
+#         #Get the contance of ToDos tables:
+#         queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
+#         # Serializing extracted information
+#         serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
+#         # Give serialized data to the view
+#         return Response(serilizer_for_queryset.data)
 
 
 def api_index(request):
