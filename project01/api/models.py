@@ -13,7 +13,7 @@ class ToDo(models.Model):
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True)
-    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='user')
+    user = models.ForeignKey(to=Person, to_field='username', on_delete=models.CASCADE, related_name='user')
 
     objects = models.Manager()
 

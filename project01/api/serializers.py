@@ -11,8 +11,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
 
 class ToDoSerializer(serializers.ModelSerializer):
-    # user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = ToDo
-        fields = ['id', 'title', 'user']
+        fields = '__all__'
