@@ -67,19 +67,19 @@ def delete_completed(request):
 
 
 
-class GetToDoView(drf_generics.ListCreateAPIView):
-    serializer_class = ToDoSerializer
-    queryset = ToDo.objects.all()
+# class GetToDoView(drf_generics.ListCreateAPIView):
+#     serializer_class = ToDoSerializer
+#     queryset = ToDo.objects.all()
 
-# class GetToDoView(APIView):
-#     def get(self, request):
-#         user = request.user
-#         #Get the contance of ToDos tables:
-#         queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
-#         # Serializing extracted information
-#         serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
-#         # Give serialized data to the view
-#         return Response(serilizer_for_queryset.data)
+class GetToDoView(APIView):
+    def get(self, request):
+        user = request.user.username
+        #Get the contance of ToDos tables:
+        queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
+        # Serializing extracted information
+        serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
+        # Give serialized data to the view
+        return Response(serilizer_for_queryset.data)
 
 
 def api_index(request):
