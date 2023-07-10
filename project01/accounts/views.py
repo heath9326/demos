@@ -3,8 +3,13 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+#For DRF
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import CreateUserForm
+from .models import Person
+from .serializers import PersonSerializer
 
 
 # Create your views here.
@@ -46,3 +51,10 @@ def login_page(request):
 def logout_user(request):
     logout(request)
     return redirect('login_page')
+
+# REST Views
+class GetPersonView(APIView):
+    def get(self, request):
+        queryset = Person.objects.order_by("id").values()
+        serializer = PersonSerializer(instance=queryset, many=True)
+        return Response(serializer.data)

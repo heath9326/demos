@@ -67,19 +67,22 @@ def delete_completed(request):
     return redirect("todos:homepage")
 
 
-class GetToDoView(drf_generics.ListCreateAPIView):
-    serializer_class = ToDoSerializer
-    queryset = ToDo.objects.all()
+# REST Views
+# class GetToDoView(drf_generics.ListCreateAPIView):
+#     serializer_class = ToDoSerializer
+#     queryset = ToDo.objects.all()
 
-# class GetToDoView(APIView):
-#     def get(self, request):
-#         user = request.user.username
-#         #Get the contance of ToDos tables:
-#         queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
-#         # Serializing extracted information
-#         serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
-#         # Give serialized data to the view
-#         return Response(serilizer_for_queryset.data)
+
+class GetToDoView(APIView):
+    def get(self, request):
+        user = request.user.username
+        #Get the contance of ToDos tables:
+        queryset = ToDo.objects.all().filter(user=user).order_by("id").values()
+        # Serializing extracted information
+        serilizer_for_queryset = ToDoSerializer(instance=queryset, many=True)
+        
+        # Give serialized data to the view
+        return Response(serilizer_for_queryset.data)
 
 # class GetToDoView(APIView):
 #     def get(self, request):
@@ -104,28 +107,28 @@ class GetToDoView(drf_generics.ListCreateAPIView):
         
 #         return Response(serializer.errors, status=400)
 
+# class GetToDoView(APIView):
+#     def post(self, request):
+#         serializer = ToDoSerializer(data=request.data)
 
-    # def post(self, request):
-    #     serializer = ToDoSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # Retrieve the validated data:
+#             validated_data = serializer.validated_data
 
-    #     if serializer.is_valid():
-    #         # Retrieve the validated data:
-    #         validated_data = serializer.validated_data
-
-    #         # Retrieve the object
-    #         username_slug = validated_data['user']
-    #         try:
-    #             # Assigning value of the slug object to the field fixing the issue
-    #             username = ToDo.objects.get(user=username_slug)
-    #         except ToDo.DoesNotExist:
-    #             return Response({'error': 'Related object not found'}, status=400)
+#             # Retrieve the object
+#             username_slug = validated_data['user']
+#             try:
+#                 # Assigning value of the slug object to the field fixing the issue
+#                 username = ToDo.objects.get(user=username_slug)
+#             except ToDo.DoesNotExist:
+#                 return Response({'error': 'Related object not found'}, status=400)
             
-    #         validated_data['user'] = username
-    #         serializer.save()
+#             validated_data['user'] = username
+#             serializer.save()
 
-    #         return Response(serializer.data, status=201)
+#             return Response(serializer.data, status=201)
         
-    #     return Response(serializer.errors, status=400)
+#         return Response(serializer.errors, status=400)
 
 
 def api_index(request):
