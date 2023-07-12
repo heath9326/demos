@@ -9,8 +9,8 @@ services:
       - "8080:8000"
     depends_on:
       - db
-    extra_hosts:
-    - "host.docker.internal:host-gateway"
+    # extra_hosts:
+    # - "host.docker.internal:host-gateway"
     networks:
      - djangonetwork
     volumes:
@@ -27,7 +27,7 @@ services:
     networks:
      - djangonetwork
     ports:
-      - 5433:5433
+      - 5433:5432
 
 
 volumes:
