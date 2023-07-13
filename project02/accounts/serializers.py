@@ -4,6 +4,7 @@ from .models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
 
+
     def create(self, validated_data):
 
         user = CustomUser.objects.create_user(
