@@ -37,6 +37,7 @@ class GetCustomUsersView(APIView):
 
         return Response(serializer.data)
     
+
     def post(self, request):
         serializer = CustomUserSerializer(data=request.data)
 
@@ -46,7 +47,21 @@ class GetCustomUsersView(APIView):
             # How do I reaload the page
         else:
             return Response(serializer.errors, status=400)
-        
+
+
+    # Another way of implementing post:    
+    # def post(self, request, *args, **kwargs):
+    #     user_data = request.data
+
+    #     new_user = CustomUser.objects.create(username=user_data["username"], email=user_data[
+    #         "email"], password=cuser_data["password"])
+    #     new_user.save()
+    #     serializer = CarsSerializer(new_user)
+
+    #     return Response(serializer.data)
+
+
+    # Needs testing
     def put(self, request, *args, **kwargs):
         id = request.query_params["id"]
         user_object = CustomUser.objects.get(id=id)
@@ -61,6 +76,21 @@ class GetCustomUsersView(APIView):
 
         serializer = CustomUserSerializer(user_object)
         return Response(serializer.data)
+    
+
+    # Needs testing
+    def patch(self, request, *args, **kwargs):
+        user = CustomUser.objects.get()
+        data = request.data
+
+        user.username = data.get("username", user.username)
+        user.email = data.get("email", user.email)
+        user.password = data.get("password", user.password)
+
+        user.save()
+        serializer = CustomUserSerializer(user)
+
+        return Response(serializer.data)
         
 
 class DeleteCustomUserView(APIView):
@@ -69,7 +99,6 @@ class DeleteCustomUserView(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
 
 # Through function-based view using a decorator
 @api_view(['GET', 'POST'])
@@ -110,7 +139,10 @@ class DestroyCustomUserView(drf_generics.DestroyAPIView):
     serializer_class = CustomUserSerializer
 
 
-
+# Needs testing
+class UpdateCustomUserSingle(drf_generics.UpdateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
 
 # Test Views
 def test(request, pk):
