@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view, schema
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics as drf_generics
-
+from rest_framework.permissions import IsAdminUser
 
 
 # Through class view
@@ -34,6 +34,21 @@ class GetCustomUsersView(APIView):
         else:
             return Response(serializer.errors, status=400)
         
+    def put(self, request, *args, **kwargs):
+        id = request.query_params["id"]
+        user_object = CustomUser.objects.get(id=id)
+
+        data = request.data
+
+        user_object.username = data["car_brand"]
+        user_object.email = data["car_model"]
+        user_object.password = data["production_year"]
+
+        user_object.save()
+
+        serializer = CustomUserSerializer(user_object)
+        return Response(serializer.data)
+        
 
 class DeleteCustomUserView(APIView):
     def delete(self, request, pk):
@@ -41,6 +56,7 @@ class DeleteCustomUserView(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
 
 # Through function-based view using a decorator
 @api_view(['GET', 'POST'])
@@ -74,6 +90,11 @@ class SingleUserRetrieveView(drf_generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+class DestroyCustomUserView(drf_generics.DestroyAPIView):
+    permission_classes = (IsAdminUser, )
+
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
 
 
 
