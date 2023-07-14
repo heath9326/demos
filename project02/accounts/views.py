@@ -18,9 +18,22 @@ from rest_framework.permissions import IsAdminUser
 class GetCustomUsersView(APIView):
     serializer_class = CustomUserSerializer
 
-    def get(self, request):
-        queryset = CustomUser.objects.all().order_by('id')
-        serializer = CustomUserSerializer(instance=queryset, many=True)
+
+    def get_queryset(self):
+        users = CustomUser.objects.all()
+        return users
+    
+
+    def get(self, request, *args, **kwargs):
+
+        try:
+            id = request.query_params['id']
+            if id != None:
+                user = CustomUser.objects.get(id=id)
+                serializer = CustomUserSerializer(user)
+        except:
+            queryset = self.get_queryset()
+            serializer = CustomUserSerializer(instance=queryset, many=True)
 
         return Response(serializer.data)
     
