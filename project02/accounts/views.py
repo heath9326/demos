@@ -34,14 +34,17 @@ class GetCustomUsersView(APIView):
         else:
             return Response(serializer.errors, status=400)
         
+
+class DeleteCustomUserView(APIView):
     def delete(self, request, pk):
         user = CustomUser.objects.filter(id=pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
+    
+
 # Through function-based view using a decorator
 @api_view(['GET', 'POST'])
-def get_users(request):
+def get_users_decorator(request):
     # Does not render and HTTP 
     renderer_classes = [CustomUserSerializer]
     
