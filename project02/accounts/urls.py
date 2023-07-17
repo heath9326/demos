@@ -1,7 +1,7 @@
 from django.urls import path
 
 # Imports
-from .views import GetCustomUsersView, CustomUserListAPIView, SingleUserRetrieveView, DeleteCustomUserView, DestroyCustomUserView, get_users_decorator, test
+from .views import GetCustomUsersView, CustomUserListAPIView, SingleUserRetrieveView, DeleteCustomUserView, DestroyCustomUserView, UpdateCustomUserSingle, get_users_decorator, test
 
 
 app_name = 'accounts'
@@ -13,6 +13,7 @@ urlpatterns = [
     path('getuserslist', CustomUserListAPIView.as_view(),name='getuserslist'),
     path('getsingleuser/<int:pk>', SingleUserRetrieveView.as_view(), name='getsingleuser'),
     path('destroysingleuser/<int:pk>', DestroyCustomUserView.as_view(), name='destroysingleuser'),
+    path('updatesingleuser/<int:pk>', UpdateCustomUserSingle.as_view(), name='updatesingleuser'),
     path('test/<int:pk>/', test, name='test'),
     # path('testkwargs', testkwargs, name='testkwargs'),
 ]

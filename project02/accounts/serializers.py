@@ -16,4 +16,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        exclude = ('groups', 'user_permissions', )
+        extra_kwargs = {
+            'username': {'read_only': False},
+            'email': {'read_only': False},
+            'password': {'read_only': False}
+        }

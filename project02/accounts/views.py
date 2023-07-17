@@ -7,7 +7,7 @@ from .serializers import CustomUserSerializer
 
 # REST
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, schema
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics as drf_generics
@@ -63,14 +63,22 @@ class GetCustomUsersView(APIView):
 
     # Needs testing
     def put(self, request, *args, **kwargs):
+        #FIXME KeyError
         id = request.query_params["id"]
         user_object = CustomUser.objects.get(id=id)
 
         data = request.data
 
-        user_object.username = data["car_brand"]
-        user_object.email = data["car_model"]
-        user_object.password = data["production_year"]
+        user_object.password = data["password"]
+        user_object.last_login = data["last_login"]
+        user_object.is_superuser = data["is_superuser"]
+        user_object.username = data["username"]
+        user_object.first_name= data["first_name"]
+        user_object.last_name= data["last_name"]
+        user_object.is_staff= data["is_staff"]
+        user_object.is_active= data["is_active"]
+        user_object.data_joined = data["date_joined"]
+        user_object.email = data["email"]
 
         user_object.save()
 
@@ -80,15 +88,17 @@ class GetCustomUsersView(APIView):
 
     # Needs testing
     def patch(self, request, *args, **kwargs):
-        user = CustomUser.objects.get()
+        #FIXME Does not do anything
+        id = request.query_params["id"]
+        user_object = CustomUser.objects.get(id=id)
         data = request.data
 
-        user.username = data.get("username", user.username)
-        user.email = data.get("email", user.email)
-        user.password = data.get("password", user.password)
+        user_object.username = data.get("username", user_object.username)
+        user_object.email = data.get("email", user_object.email)
+        user_object.password = data.get("password", user_object.password)
 
-        user.save()
-        serializer = CustomUserSerializer(user)
+        user_object.save()
+        serializer = CustomUserSerializer(user_object)
 
         return Response(serializer.data)
         
@@ -119,8 +129,12 @@ def get_users_decorator(request):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=400)
+    #TODO: elif request.method == "PUT":
+    #TODO: elif request.method == "PATCH":            
     else:
         return Response({'error': 'Type of request is not handled yet!'}, status=400)
+
+
     
 
 # This view functions as an alternative to APIView get
@@ -139,8 +153,8 @@ class DestroyCustomUserView(drf_generics.DestroyAPIView):
     serializer_class = CustomUserSerializer
 
 
-# Needs testing
 class UpdateCustomUserSingle(drf_generics.UpdateAPIView):
+    #FIXME works, but does not hash passwords
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
