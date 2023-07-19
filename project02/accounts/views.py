@@ -13,6 +13,10 @@ from rest_framework import status
 from rest_framework import generics as drf_generics
 from rest_framework.permissions import IsAdminUser
 
+# Tools
+from datetime import datetime
+from django.shortcuts import get_object_or_404
+
 
 # Through class view
 class GetCustomUsersView(APIView):
@@ -142,9 +146,11 @@ class CustomUserListAPIView(drf_generics.ListAPIView):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
 
+
 class SingleUserRetrieveView(drf_generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
 
 class DestroyCustomUserView(drf_generics.DestroyAPIView):
     permission_classes = (IsAdminUser, )
@@ -158,11 +164,45 @@ class UpdateCustomUserSingle(drf_generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+
+class ListCreateCustomUserSingle(drf_generics.ListCreateAPIView):
+    serializer_class = CustomUserSerializer
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(date_joined__contains=datetime.today().date())
+
+
+class RetrieveUpdateCustomUserSingle(drf_generics.RetrieveUpdateAPIView):
+    serializer_class = CustomUserSerializer
+    lookup_field = 'username'
+
+    def get_object(self):
+        username = self.kwargs['username']
+        return get_object_or_404(CustomUser, username=username)
+
+
+class RetrieveDestroyCustomUserSingle(drf_generics.RetrieveDestroyAPIView):
+    serializer_class = CustomUserSerializer
+    lookup_field = 'email'
+
+    def get_object(self):
+        email = self.kwargs['email']
+        return get_object_or_404(CustomUser, email=email)
+
+class RetrieveUpdateDestroyCustomUserSingle(drf_generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CustomUserSerializer
+    lookup_field = 'email'
+
+    def get_object(self):
+        email = self.kwargs['email']
+        return get_object_or_404(CustomUser, email=email)
+
+
 # Test Views
 def test(request, pk):
     id = pk
     return HttpResponse('ID is %s' % id)
 
-# def testkwargs(request):
-#     id = request.query_params('id')
-#     return HttpResponse('ID is %s' % id)
+def testkwargs(request):
+    id = request.GET.get('id')
+    return HttpResponse('ID is %s' % id)

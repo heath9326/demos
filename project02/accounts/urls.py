@@ -1,7 +1,7 @@
 from django.urls import path
 
 # Imports
-from .views import GetCustomUsersView, CustomUserListAPIView, SingleUserRetrieveView, DeleteCustomUserView, DestroyCustomUserView, UpdateCustomUserSingle, get_users_decorator, test
+from .views import GetCustomUsersView, CustomUserListAPIView, SingleUserRetrieveView, DeleteCustomUserView, DestroyCustomUserView, UpdateCustomUserSingle, ListCreateCustomUserSingle, RetrieveUpdateCustomUserSingle, RetrieveDestroyCustomUserSingle, RetrieveUpdateDestroyCustomUserSingle, get_users_decorator, test, testkwargs
 
 
 app_name = 'accounts'
@@ -14,6 +14,10 @@ urlpatterns = [
     path('getsingleuser/<int:pk>', SingleUserRetrieveView.as_view(), name='getsingleuser'),
     path('destroysingleuser/<int:pk>', DestroyCustomUserView.as_view(), name='destroysingleuser'),
     path('updatesingleuser/<int:pk>', UpdateCustomUserSingle.as_view(), name='updatesingleuser'),
+    path('listcreateusers', ListCreateCustomUserSingle.as_view(), name='listcreateusers'),
+    path('retrieveupdatesingleuser/<username>', RetrieveUpdateCustomUserSingle.as_view(), name='retrieveupdatesingleuser'),
+    path('retrievedestroysingleuser/<email>', RetrieveDestroyCustomUserSingle.as_view(), name='retrievedestroysingleuser'),
+    path('retrievedestroyupdatesingleuser/<email>', RetrieveUpdateDestroyCustomUserSingle.as_view(), name='retrievedestroyupdatesingleuser'),
     path('test/<int:pk>/', test, name='test'),
-    # path('testkwargs', testkwargs, name='testkwargs'),
+    path('testkwargs/', testkwargs, name='testkwargs'),
 ]
