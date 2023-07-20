@@ -67,7 +67,7 @@ class GetCustomUsersView(APIView):
 
     # Needs testing
     def put(self, request, *args, **kwargs):
-        #FIXME KeyError
+        # Works (needs data in JSON format and id in kwargs)
         id = request.query_params["id"]
         user_object = CustomUser.objects.get(id=id)
 
@@ -90,9 +90,8 @@ class GetCustomUsersView(APIView):
         return Response(serializer.data)
     
 
-    # Needs testing
     def patch(self, request, *args, **kwargs):
-        #FIXME Does not do anything
+        # Works (needs data in JSON format and id in kwargs) 
         id = request.query_params["id"]
         user_object = CustomUser.objects.get(id=id)
         data = request.data
@@ -115,7 +114,7 @@ class DeleteCustomUserView(APIView):
     
 
 # Through function-based view using a decorator
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def get_users_decorator(request):
     # Does not render and HTTP 
     renderer_classes = [CustomUserSerializer]
@@ -125,6 +124,7 @@ def get_users_decorator(request):
         serializer = CustomUserSerializer(instance=queryset, many=True)
 
         return Response(serializer.data)
+
     elif request.method == 'POST':
         serializer = CustomUserSerializer(data=request.data)
 
@@ -133,8 +133,33 @@ def get_users_decorator(request):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=400)
-    #TODO: elif request.method == "PUT":
-    #TODO: elif request.method == "PATCH":            
+
+    elif request.method == "PUT":
+        id = request.query_params["id"]
+        user_object = CustomUser.objects.get(id=id)
+        serializer = CustomUserSerializer(user_object, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "PATCH":
+        id = request.query_params["id"]
+        user_object = CustomUser.objects.get(id=id)
+        serializer = CustomUserSerializer(user_object, data=request.data, partial=True) 
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        id = request.query_params["id"]
+        user = CustomUser.objects.filter(id=id)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     else:
         return Response({'error': 'Type of request is not handled yet!'}, status=400)
 
