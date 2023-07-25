@@ -25,8 +25,17 @@ class ArticleSetSerializer(serializers.ModelSerializer):
         fields = ['title', 'text', 'authors']
 
     #TODO: def create, где авторы = список авторов из validated data,  потом for author in authors(Author.)
-
-#FIXME: Doest not regect post form if black=False fields are empty:
+    # Что вызывается сначала модель.save() или сериализатор.сreate()?
+    def create(self, validated_data):
+        instance = Article.objects.create()
+        author_ids = validated_data["authors"]
+        queryset = Author.objects.filter(id__in=author_ids)
+        [
+            instance.authors.add(author.id)
+            for author in queryset
+        ]
+        #instance.save()
+        #return instance
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

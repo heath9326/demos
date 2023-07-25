@@ -7,12 +7,12 @@ from common.models import TimeStampedModel, SlugFieldModel
 
 # Tools
 from django.template.defaultfilters import slugify
-
+from transliterate import translit
 
 class Article(TimeStampedModel, SlugFieldModel):
     title = models.CharField(max_length=150)
     text = models.TextField(blank=False)
-    authors = models.ManyToManyField(Author, related_name='articles', blank=False)
+    authors = models.ManyToManyField(Author, related_name='articles')
 
     objects = models.Manager()
 
@@ -20,10 +20,10 @@ class Article(TimeStampedModel, SlugFieldModel):
         return f'Article №{self.id}: "{self.title}"'
 
     def save(self, *args, **kwargs):
+        # Set slug only once, to avoid broken links:
         if not self.id:
-            #FIXME: ignores russian
-            # Newly created object, so set slug
-            self.slug = slugify(self.title)
+            translit = translit(self.title, language_code='ru', reversed=True)
+            self.slug = slugify(translit)
 
         super(Article, self).save(*args, **kwargs)
 
