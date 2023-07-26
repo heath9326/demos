@@ -21,9 +21,10 @@ class Article(TimeStampedModel, SlugFieldModel):
 
     def save(self, *args, **kwargs):
         # Set slug only once, to avoid broken links:
-        if not self.id:
-            translit = translit(self.title, language_code='ru', reversed=True)
-            self.slug = slugify(translit)
+        # FIXME: это заплатка:
+        if not self.slug or self.slug == 'slug':
+            translit_ = translit(self.title, language_code='ru', reversed=True)
+            self.slug = slugify(translit_)
 
         super(Article, self).save(*args, **kwargs)
 
