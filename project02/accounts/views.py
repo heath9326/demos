@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 # Project specific:
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, CustomUserHyperlinkedSerializer
 
 # REST
 from rest_framework.response import Response
@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics as drf_generics
 from rest_framework.permissions import IsAdminUser
+from rest_framework import viewsets
+from rest_framework.decorators import action
 
 # Tools
 from datetime import datetime
@@ -164,7 +166,61 @@ def get_users_decorator(request):
         return Response({'error': 'Type of request is not handled yet!'}, status=400)
 
 
+class CustomUserViewSet(viewsets.ViewSet):
+    ''' 
+    ViewSet that handles the same functions as main APIView
+
+    '''
+    serializer = CustomUserSerializer
+    queryset = CustomUser.objects.all()
+    #lookup_field = 'id'
     
+    def list(self, request):
+        serializer = self.serializer(instance=self.queryset, many=True)    
+        return Response(serializer.data)
+    
+    def destroy(self, request, pk=None):
+        user = get_object_or_404(self.queryset, pk=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def retrieve(self, request, pk=None):
+        user = get_object_or_404(self.queryset, pk=pk)
+        serializer = self.serializer(user)
+        return Response(serializer.data)
+
+
+    #TODO: def create(self, request, pk=None)
+    #TODO: def update(self, request, pk=None)
+    #TODO: def partial_update(self, request, pk=None)
+
+
+class CustomUserModelView(viewsets.ModelViewSet):
+    ''' 
+    ViewSet that handles the same functions as main APIView
+
+    '''
+    serializer_class = CustomUserSerializer
+    queryset = CustomUser.objects.all()
+
+    def list(self, request):
+        serializer = self.serializer_class(instance=self.queryset, many=True)    
+        return Response(serializer.data)
+
+    #def retrieve(self, request, pk=None):
+
+
+    #TODO: def create(self, request, pk=None)
+    #TODO: def update(self, request, pk=None)
+    #TODO: def partial_update(self, request, pk=None)
+    
+
+    @action(detail=True, methods=['put', 'patch'], url_path='inactive')
+    def inactive(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.make_inactive()
+        return Response({'status': 'inactive'})
+
 
 # This view functions as an alternative to APIView get
 class CustomUserListAPIView(drf_generics.ListAPIView):
@@ -214,6 +270,7 @@ class RetrieveDestroyCustomUserSingle(drf_generics.RetrieveDestroyAPIView):
         email = self.kwargs['email']
         return get_object_or_404(CustomUser, email=email)
 
+
 class RetrieveUpdateDestroyCustomUserSingle(drf_generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CustomUserSerializer
     lookup_field = 'email'
@@ -221,6 +278,24 @@ class RetrieveUpdateDestroyCustomUserSingle(drf_generics.RetrieveUpdateDestroyAP
     def get_object(self):
         email = self.kwargs['email']
         return get_object_or_404(CustomUser, email=email)
+
+#FIXME: Не работает от слова совсем
+class CustomUserHyperlinkedAPI(APIView):
+    serializer_class = CustomUserHyperlinkedSerializer
+    
+    def get_queryset(self):
+        users = CustomUser.objects.all()
+        return users
+    
+    def get(self, request):
+        queryset = self.get_queryset()
+        serializer_context = {
+            'request': request,
+        }
+        serializer = CustomUserHyperlinkedSerializer(instance=queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
+
+
 
 
 # Test Views
