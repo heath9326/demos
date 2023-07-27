@@ -168,17 +168,25 @@ def get_users_decorator(request):
 
 class CustomUserViewSet(viewsets.ViewSet):
     ''' 
-    ViewSet that handles the same functions as main APIView
+    ModelViewSet that handles the same functions as main APIView
 
     '''
     serializer = CustomUserSerializer
     queryset = CustomUser.objects.all()
-    #lookup_field = 'id'
     
     def list(self, request):
         serializer = self.serializer(instance=self.queryset, many=True)    
         return Response(serializer.data)
     
+    def create(self, request, pk=None):
+        data = request.data
+        serializer = self.serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=400)
+
     def destroy(self, request, pk=None):
         user = get_object_or_404(self.queryset, pk=pk)
         user.delete()
@@ -189,10 +197,40 @@ class CustomUserViewSet(viewsets.ViewSet):
         serializer = self.serializer(user)
         return Response(serializer.data)
 
+    def update(self, request, pk=None):
+        user = get_object_or_404(self.queryset, pk=pk)
 
-    #TODO: def create(self, request, pk=None)
-    #TODO: def update(self, request, pk=None)
-    #TODO: def partial_update(self, request, pk=None)
+        data = request.data
+
+        user.password = data["password"]
+        user.last_login = data["last_login"]
+        user.is_superuser = data["is_superuser"]
+        user.username = data["username"]
+        user.first_name= data["first_name"]
+        user.last_name= data["last_name"]
+        user.is_staff= data["is_staff"]
+        user.is_active= data["is_active"]
+        user.data_joined = data["date_joined"]
+        user.email = data["email"]
+
+        user.save()
+
+        serializer = self.serializer(user)
+        return Response(serializer.data)
+    
+
+    def partial_update(self, request, pk=None):
+        user = get_object_or_404(self.queryset, pk=pk)
+        data = request.data
+
+        user.username = data.get("username", user.username)
+        user.email = data.get("email", user.email)
+        user.password = data.get("password", user.password)
+
+        user.save()
+        serializer = self.serializer(user)
+
+        return Response(serializer.data)
 
 
 class CustomUserModelView(viewsets.ModelViewSet):
@@ -203,17 +241,23 @@ class CustomUserModelView(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
 
-    def list(self, request):
-        serializer = self.serializer_class(instance=self.queryset, many=True)    
-        return Response(serializer.data)
+    # def list(self, request):
+        #WORKS BY DEFAULT
 
-    #def retrieve(self, request, pk=None):
+    # def retrieve(self, request, pk=None):
+        #WORKS BY DEFAULT
 
+    #def create(self, request, pk=None):
+        #WORKS BY DEFAULT
+   
+    #def update(self, request, pk=None)
+        #WORKS BY DEFAULT
 
-    #TODO: def create(self, request, pk=None)
-    #TODO: def update(self, request, pk=None)
-    #TODO: def partial_update(self, request, pk=None)
+    #def partial_update(self, request, pk=None)
+        #WORKS BY DEFAULT
     
+    #def destroy(self, request, pk=None):
+        #WORKS BY DEFAULT
 
     @action(detail=True, methods=['put', 'patch'], url_path='inactive')
     def inactive(self, request, *args, **kwargs):

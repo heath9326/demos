@@ -17,8 +17,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         exclude = ('groups', 'user_permissions', )
+        #FIXME: date_joined should be read only
+
+
+class CustomUserHyperlinkedSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = CustomUser
+        fields = ['url' , 'id', 'username']
         extra_kwargs = {
-            'username': {'read_only': False},
-            'email': {'read_only': False},
-            'password': {'read_only': False}
+               "url":{
+                  "view_name": "accounts:hyperlinkedusers",
+                  "lookup_field": "username"
+                }
         }

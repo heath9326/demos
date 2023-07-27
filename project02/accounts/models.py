@@ -11,4 +11,8 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f'CustomUser [{self.username}]: <{self.email}>'
     
+    def make_inactive(self):
+        self.is_active = False
+        self.save()
 
+    #FIXME: переопределить update method так что если в кваргах есть пассворт использовать set_password() вместо user["password"] = data["password"] 
