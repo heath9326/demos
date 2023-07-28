@@ -1,12 +1,12 @@
 from django.urls import path
 
 # Imports
-from .views import GetArticlesView, GetCommentsView
+from .views import ArticlesViewAPI, GetCommentsView
 
 
 app_name = 'articles'
 
 urlpatterns = [
-    path('getarticlesapi', GetArticlesView.as_view(), name='getarticlesapi'),
+    path('articlesviewapi', ArticlesViewAPI.as_view(), name='articlesviewapi'),
     path('getcommentsapi', GetCommentsView.as_view(), name='getcommentsapi'),
 ]

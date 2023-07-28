@@ -4,6 +4,7 @@ from django.http import HttpResponse
 # Project specific:
 from .models import CustomUser
 from .serializers import CustomUserSerializer, CustomUserHyperlinkedSerializer
+from common.renderes import PlainTextRenderer
 
 # REST
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from rest_framework import generics as drf_generics
 from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework import renderers
 
 # Tools
 from datetime import datetime
@@ -23,12 +25,25 @@ from django.shortcuts import get_object_or_404
 # Through class view
 class GetCustomUsersView(APIView):
     serializer_class = CustomUserSerializer
+    renderer_classes = [PlainTextRenderer]
 
 
     def get_queryset(self):
         users = CustomUser.objects.all()
         return users
-    
+
+    #Test get request for TemplateHTMLRenderer
+    # def get(self, request, *args, **kwargs):
+
+    #     try:
+    #         id = request.query_params['id']
+    #         if id != None:
+    #             data = CustomUser.objects.get(id=id)
+    #     except:
+    #         data = self.get_queryset()
+
+    #     #Template for rendering needs to be customized for it to work    
+    #     return Response({'data': data}, template_name='users.html')    
 
     def get(self, request, *args, **kwargs):
 

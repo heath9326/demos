@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Article, Comment
+from authors.models import Author
 
 class ArticleGetSerializer(serializers.ModelSerializer):
     comments = serializers.StringRelatedField(many=True)
@@ -24,19 +25,21 @@ class ArticleSetSerializer(serializers.ModelSerializer):
         model = Article
         fields = ['title', 'text', 'authors']
 
-    #TODO: def create, где авторы = список авторов из validated data,  потом for author in authors(Author.)
-    # Что вызывается сначала модель.save() или сериализатор.сreate()?
+
     def create(self, validated_data):
         instance = Article.objects.create()
         author_ids = validated_data["authors"]
-        queryset = Author.objects.filter(id__in=author_ids)
+        instance.title = validated_data["title"]
+        instance.text = validated_data["text"]
         [
             instance.authors.add(author.id)
-            for author in queryset
+            for author in author_ids
         ]
-        #instance.save()
-        #return instance
+        instance.save()
+        return instance
 
+    #TODO def update:
+        
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
