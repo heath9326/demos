@@ -14,6 +14,7 @@ from .serializers import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.renderers import (
                                         HTMLFormRenderer, 
                                         JSONRenderer, 
@@ -25,25 +26,29 @@ class ArticlesViewAPI(APIView):
     serializer_class = ArticleSetSerializer
     renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
 
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-           return ArticleGetSerializer
-        else:
-            return ArticleSetSerializer
-
     def get_queryset(self):
-        authors = Article.objects.all()
-        return authors
+        articles = Article.objects.all()
+        return articles
 
     def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(instance=queryset, many=True)
+        try:
+            id = request.query_params['id']
+            if id != None:
+                article = Article.objects.get(id=id)
+                print(article)
+                serializer = ArticleGetSerializer(article)
+            else:
+                return Response("Please input an id parameter.")
+        except ObjectDoesNotExist:
+            return Response("Article with this id does not exist.")
+        except:
+            queryset = self.get_queryset()
+            serializer = ArticleGetSerializer(instance=queryset, many=True)
+
         return Response(serializer.data)
     
     def post(self, request):
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
+        serializer = ArticleSetSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -51,9 +56,21 @@ class ArticlesViewAPI(APIView):
         else:
             return Response(serializer.errors, status=400)
 
+    def patch(self, request, *args, **kwargs):
+        id = request.query_params["id"]
+        article_object = Article.objects.get(id=id)
+        serializer = ArticleSetSerializer(article_object, data=request.data, partial=True)
+        if serializer.is_valid():
+            # serializer.update(article_object, request.data)
+            # или
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=400)
+
     #TODO: def delete()
     #TODO: def put()
-    #TODO: def patch()
+
 
 class GetCommentsView(APIView):
     serializer_class = CommentSerializer
@@ -96,3 +113,10 @@ class GetCommentsView(APIView):
 
 #TODO: class RetrieveUpdateDestroyArticlesSingle(drf_generics.RetrieveUpdateDestroyAPIView):
 
+#TODO: class ArticleModelView(viewsets.ModelViewSet):
+
+    # def get_serializer_class(self):
+    # if self.request.method == 'GET':
+    #     return ArticleGetSerializer
+    # else:
+    #     return ArticleSetSerializer

@@ -20,6 +20,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         #FIXME: date_joined should be read only
 
 
+
 class CustomUserHyperlinkedSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:

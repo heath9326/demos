@@ -17,6 +17,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import renderers
 from rest_framework.throttling import UserRateThrottle
+from django.core.exceptions import ObjectDoesNotExist
 
 # Tools
 from datetime import datetime
@@ -46,11 +47,15 @@ class GetCustomUsersView(APIView):
     #     return Response({'data': data}, template_name='users.html')    
 
     def get(self, request, *args, **kwargs):
+        
         try:
             id = request.query_params['id']
+
             if id != None:
                 user = CustomUser.objects.get(id=id)
                 serializer = CustomUserSerializer(user)
+        except ObjectDoesNotExist:
+            return Response("CustomUser with this id does not exist.")
         except:
             queryset = self.get_queryset()
             serializer = CustomUserSerializer(instance=queryset, many=True)
