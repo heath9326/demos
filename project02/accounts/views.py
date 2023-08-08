@@ -47,6 +47,11 @@ class GetCustomUsersView(APIView):
     #     return Response({'data': data}, template_name='users.html')    
 
     def get(self, request, *args, **kwargs):
+        print(request.GET)
+        id = request.GET['id']
+
+        user = get_object_or_404(CustomUser, pk=id)
+
         
         try:
             id = request.query_params['id']
